@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NightShift</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scrollbar-color:#2E3448 #0E1016}
+html::-webkit-scrollbar{width:8px}
+html::-webkit-scrollbar-track{background:#0E1016}
+html::-webkit-scrollbar-thumb{background:#2E3448;border-radius:4px}
+html::-webkit-scrollbar-thumb:hover{background:#3A4158}
+body{color:#E9ECF4;font-family:system-ui,sans-serif;padding:14px;width:320px;background:linear-gradient(180deg,#11141D 0%,#0B0D13 100%)}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+h1{font-size:17px;font-weight:800;letter-spacing:.3px;color:#E9ECF4;text-shadow:0 0 16px rgba(129,140,248,.35)}
+#ns-reset{background:rgba(255,255,255,.04);border:1px solid #2A3040;color:#9AA3B8;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;transition:all .15s}
+#ns-reset:hover{border-color:#818CF8;color:#A5B4FC;background:rgba(129,140,248,.08)}
+.section{padding:8px 0;border-top:1px solid #1F2433}
+.row{display:flex;align-items:center;justify-content:space-between;margin:6px 0}
+label{font-size:13px;color:#E9ECF4;cursor:pointer}
+.muted{font-size:11px;color:#8E97AC}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:#2A3040;border-radius:11px;cursor:pointer;transition:background .2s}
+.toggle .slider::after{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;background:#8E97AC;border-radius:50%;transition:transform .2s,background .2s}
+.toggle input:checked+.slider{background:linear-gradient(90deg,#6366F1,#38BDF8)}
+.toggle input:checked+.slider::after{transform:translateX(18px);background:#E9ECF4}
+.btn-site{border:none;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;background:#1A1F2E;color:#E9ECF4;border:1px solid #2A3040}
+.btn-site.on{background:linear-gradient(90deg,#6366F1,#38BDF8);color:#0B0E16;border-color:transparent;font-weight:600}
+.btn-site:disabled{opacity:.4;cursor:default}
+.seg{display:flex;gap:4px;background:#12151F;border:1px solid #232A3A;border-radius:10px;padding:4px}
+.seg button{flex:1;padding:6px 0;background:transparent;color:#8E97AC;border:1px solid transparent;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+.seg button:hover{color:#E9ECF4;background:#1A2030;border-color:#2A3448}
+.seg button.active{background:#232B45;color:#A5B4FC;border-color:#4C5AC9;box-shadow:0 0 12px rgba(99,102,241,.25)}
+.slider-row{display:flex;align-items:center;gap:6px;margin:4px 0}
+.slider-row span{font-size:11px;color:#8E97AC;min-width:38px;text-align:right;background:#151A27;border:1px solid #232A3A;border-radius:6px;padding:2px 5px}
+.rst{background:transparent;border:1px solid #333C55;color:#9AA3B8;border-radius:6px;cursor:pointer;font-size:11px;line-height:1;padding:5px 7px;transition:all .15s}
+.rst:hover{color:#A5B4FC;border-color:#818CF8;background:rgba(129,140,248,.08)}
+input[type="range"]{flex:1;accent-color:#818CF8;height:4px}
+input[type="checkbox"]{accent-color:#818CF8;margin-right:6px;cursor:pointer}
+select,input[type="time"],input[type="date"]{background:#151A27;color:#E9ECF4;border:1px solid #2A3142;border-radius:6px;padding:3px 6px;font-size:11px;color-scheme:dark;cursor:pointer}
+textarea{width:100%;background:#12151F;color:#C7D0E4;border:1px solid #2A3142;border-radius:8px;padding:6px;font-family:Consolas,monospace;font-size:11px;resize:vertical;color-scheme:dark}
+input[type="color"]{width:34px;height:22px;padding:0;border:1px solid #2A3142;border-radius:6px;background:none;cursor:pointer}
+input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
+.preview{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.preview .chip{font-size:10px;font-family:Consolas,monospace;padding:3px 6px;border-radius:5px;border:1px solid #2A3040;background:#151A27;color:#C7D0E4}
+.preset-row{display:flex;gap:6px}
+.preset{display:flex;gap:6px;align-items:center;justify-content:center;flex:1;padding:6px 0;background:#151A27;border:1px solid #2A3142;border-radius:8px;color:#C7D0E4;cursor:pointer;font-size:11px;transition:all .15s}
+.preset:hover{border-color:#818CF8;color:#FFF;background:#1A2236}
+.swatch{width:12px;height:12px;border-radius:4px;border:1px solid rgba(255,255,255,.25);flex:none}
+.fs-chip{flex:1;background:#151A27;border:1px solid #2A3142;border-radius:6px;color:#C7D0E4;cursor:pointer;font-size:11px;padding:4px 0;transition:all .15s}
+.fs-chip:hover,.fs-chip.active{border-color:#818CF8;color:#FFF;background:#1A2236}
+.chip{cursor:pointer;user-select:none}
+.chip:hover{outline:1px solid #818CF8;transform:translateY(-1px)}
+.seg button:focus-visible,.preset:focus-visible,#ns-reset:focus-visible{outline:2px solid #818CF8;outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>NightShift</h1>
+<button id="ns-reset">Reset</button>
+</div>
+
+<div class="section">
+<div class="row">
+<label for="ns-enabled">Enabled</label>
+<label class="toggle"><input type="checkbox" id="ns-enabled" checked><span class="slider"></span></label>
+</div>
+</div>
+
+<div class="section">
+<div class="row">
+<label id="ns-site" class="btn-site">On this site: OFF</label>
+<select id="ns-site-mode"><option value="">Site default</option><option value="dark">Dark</option><option value="oled">OLED</option><option value="dim">Dim</option></select>
+</div>
+<div class="muted" id="ns-host" style="margin-top:2px"></div>
+</div>
+
+<div class="section">
+<label style="margin-bottom:4px">Mode</label>
+<div class="seg" id="ns-mode">
+<button data-value="dark">Dark</button>
+<button data-value="oled">OLED</button>
+<button data-value="dim">Dim</button>
+</div>
+<div class="muted" style="margin-top:2px">Dark: balanced · OLED: true black · Dim: soft contrast</div>
+</div>
+
+<div class="section">
+<label>Presets</label>
+<div class="preset-row">
+<button class="preset" data-preset="midnight"><span class="swatch" style="background:#121212"></span>Midnight</button>
+<button class="preset" data-preset="oled"><span class="swatch" style="background:#000000"></span>OLED</button>
+<button class="preset" data-preset="paper"><span class="swatch" style="background:#2A2515"></span>Warm paper</button>
+<button class="preset" data-preset="night"><span class="swatch" style="background:#1E1A0E"></span>Dim night</button>
+</div>
+</div>
+
+<div class="section">
+<label>Brightness</label>
+<div class="slider-row">
+<input type="range" id="ns-brightness" min="40" max="160" step="1" value="100">
+<span id="ns-brightness-val">100%</span>
+<button class="rst" id="ns-reset-brightness" title="Reset to 100%">↺</button>
+</div>
+<label>Contrast</label>
+<div class="slider-row">
+<input type="range" id="ns-contrast" min="40" max="160" step="1" value="100">
+<span id="ns-contrast-val">100%</span>
+<button class="rst" id="ns-reset-contrast" title="Reset to 100%">↺</button>
+</div>
+<label>Warmth</label>
+<div class="slider-row">
+<input type="range" id="ns-warmth" min="0" max="100" step="1" value="0">
+<span id="ns-warmth-val">0%</span>
+<button class="rst" id="ns-reset-warmth" title="Reset to 0%">↺</button>
+</div>
+<label style="margin-top:6px;font-size:11px;color:#8E97AC;display:block">Live palette</label>
+<div id="ns-preview" class="preview"></div>
+</div>
+
+<details class="section">
+<summary style="cursor:pointer;font-weight:600;color:#C7D0E4;font-size:12px">Reading</summary>
+<label>Font size</label>
+<div class="slider-row"><input type="range" id="ns-font-size" min="85" max="130" step="1" value="100"><span id="ns-font-size-val">100%</span><button class="rst" id="ns-reset-font-size" title="Reset to 100%">↺</button></div>
+<div class="preset-row" style="margin-top:2px"><button class="fs-chip" data-fs="85">S</button><button class="fs-chip" data-fs="100">M</button><button class="fs-chip" data-fs="115">L</button><button class="fs-chip" data-fs="130">XL</button></div>
+<div class="row"><label>Font</label><select id="ns-font-family"><option value="system">System</option><option value="serif">Serif</option><option value="mono">Monospace</option></select></div>
+<label>Line height</label>
+<div class="slider-row"><input type="range" id="ns-line-height" min="130" max="190" step="1" value="160"><span id="ns-line-height-val">1.6</span><button class="rst" id="ns-reset-line-height" title="Reset to 1.6">↺</button></div>
+</details>
+
+<details class="section">
+<summary style="cursor:pointer;font-weight:600;color:#C7D0E4;font-size:12px">Customize</summary>
+<div class="row"><label>Background</label><input type="color" id="ns-custom-bg" value="#121212"></div>
+<div class="row"><label>Text</label><input type="color" id="ns-custom-fg" value="#e6e6e6"></div>
+<div class="row"><label>Accent</label><input type="color" id="ns-custom-accent" value="#8ab4f8"><button class="rst" id="ns-reset-colors" title="Reset custom colors">×</button></div>
+<div class="row"><label>Card</label><input type="color" id="ns-custom-card" value="#1b1d21"></div>
+<div class="muted" style="margin-top:2px">Leave defaults to use the active mode palette</div>
+<label style="margin-top:6px">Custom CSS</label>
+<textarea id="ns-custom-css" rows="4" spellcheck="false" placeholder="html.nightshift-on .my-class { }"></textarea>
+<div class="muted">Applies while NightShift is on</div>
+</details>
+
+<details class="section">
+<summary style="cursor:pointer;font-weight:600;color:#C7D0E4;font-size:12px">Advanced</summary>
+<div class="row"><label for="ns-schedule">Auto schedule</label><label class="toggle"><input type="checkbox" id="ns-schedule"><span class="slider"></span></label></div>
+<div class="muted" style="margin-top:2px">From <input type="time" id="ns-sched-start" value="20:00"> to <input type="time" id="ns-sched-end" value="06:00"></div>
+<div class="row"><label for="ns-media">Protect images &amp; media</label><label class="toggle"><input type="checkbox" id="ns-media" checked><span class="slider"></span></label></div>
+<div class="row"><label for="ns-follow">Follow system dark mode</label><label class="toggle"><input type="checkbox" id="ns-follow"><span class="slider"></span></label></div>
+<div class="muted" style="margin-top:2px">Turns on when your OS uses dark mode</div>
+</details>
+
+<script src="popup.js"></script>
+</body>
+</html>
