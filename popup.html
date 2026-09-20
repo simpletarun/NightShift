@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NightShift</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scrollbar-color:#2a3040 #0f1115}
+html::-webkit-scrollbar{width:10px}
+html::-webkit-scrollbar-track{background:#0f1115}
+html::-webkit-scrollbar-thumb{background:#2a3040;border-radius:6px;border:2px solid #0f1115}
+body{color:#eef1f6;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;width:340px;background:#0f1115}
+.main{padding:14px;display:flex;flex-direction:column;gap:9px}
+button{font-family:inherit;cursor:pointer}
+button:hover{transition:color .15s,background .15s,border-color .15s,transform .15s}
+button:not(:disabled):active{transform:scale(.98)}
+button:focus-visible{outline:2px solid #6366F1;outline-offset:1px}
+
+.header{display:flex;align-items:center;gap:8px}
+.logo{position:relative;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);box-shadow:0 2px 8px rgba(99,102,241,.35);flex-shrink:0}
+.logo::after{content:"";position:absolute;top:4px;left:9px;width:19px;height:19px;border-radius:50%;background:#0f1115}
+h1{font-size:15px;font-weight:700;letter-spacing:.2px;margin-right:auto}
+#ns-reset{background:#171b22;border:1px solid #232a36;color:#8b93a7;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600}
+#ns-reset:hover{color:#fff;border-color:#6366F1}
+
+.card{background:#171b22;border:1px solid #232a36;border-radius:12px;padding:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+label{font-size:13px;color:#eef1f6;cursor:pointer}
+.muted{font-size:11px;color:#8b93a7;line-height:1.5}
+
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle .slider{position:absolute;inset:0;background:#232a36;border-radius:11px;cursor:pointer;transition:background .2s}
+.toggle .slider::after{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#8b93a7;border-radius:50%;transition:transform .2s,background .2s}
+.toggle input:checked+.slider{background:linear-gradient(90deg,#6366F1,#38BDF8)}
+.toggle input:checked+.slider::after{transform:translateX(18px);background:#fff}
+.toggle input:focus-visible+.slider{box-shadow:0 0 0 3px rgba(99,102,241,.4)}
+.toggle.big{width:48px;height:27px}
+.toggle.big .slider{border-radius:14px}
+.toggle.big .slider::after{width:21px;height:21px;top:3px;left:3px}
+.toggle.big input:checked+.slider::after{transform:translateX(21px)}
+.toggle-card:has(#ns-enabled:checked){border-color:#3a4260;box-shadow:0 0 0 1px rgba(99,102,241,.18)}
+
+.seg{display:flex;gap:5px;background:#10141b;border:1px solid #232a36;border-radius:11px;padding:4px}
+.seg button{flex:1;padding:9px 0;background:transparent;color:#8b93a7;border:1px solid transparent;border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:600;transition:all .15s}
+.seg button:hover{color:#eef1f6;background:#1f2632}
+.seg button.active{background:#242e52;color:#aab6ff;border-color:#3f4bba}
+
+.preset-row{display:flex;gap:6px}
+.preset{display:flex;gap:6px;align-items:center;justify-content:center;flex:1;padding:8px 0;background:#10141b;border:1px solid #232a36;border-radius:10px;color:#c3cad9;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+.preset:hover{background:#1b2130;border-color:#6366F1;color:#fff}
+.swatch{width:11px;height:11px;border-radius:4px;border:1px solid rgba(255,255,255,.25);flex:none}
+
+.slider-row{display:flex;align-items:center;gap:8px}
+.slider-row label{min-width:56px;font-size:11px;color:#8b93a7}
+.slider-row span{font-size:10.5px;color:#8b93a7;min-width:32px;text-align:right;background:#10141b;border:1px solid #232a36;border-radius:7px;padding:2px 5px;font-variant-numeric:tabular-nums}
+.rst{background:transparent;border:1px solid #2a3140;color:#8b93a7;border-radius:7px;cursor:pointer;font-size:11px;line-height:1;padding:5px 7px;flex-shrink:0}
+.rst:hover{color:#aab6ff;border-color:#6366F1;background:rgba(99,102,241,.08)}
+
+input[type="range"]{-webkit-appearance:none;appearance:none;flex:1;height:18px;background:transparent;cursor:pointer}
+input[type="range"]::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:#262c38}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;background:#eef1f6;border:none;box-shadow:0 1px 4px rgba(0,0,0,.5);transition:transform .15s}
+input[type="range"]:hover::-webkit-slider-thumb{transform:scale(1.15)}
+input[type="range"]:focus-visible{outline:none}
+input[type="range"]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(99,102,241,.45)}
+
+.fs-chip{flex:1;background:#10141b;border:1px solid #232a36;border-radius:8px;color:#c3cad9;cursor:pointer;font-size:11px;font-weight:600;padding:5px 0;transition:all .15s}
+.fs-chip:hover,.fs-chip.active{background:#1b2130;border-color:#6366F1;color:#fff}
+
+.btn-site{flex:1;text-align:left;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;background:#1c212c;color:#eef1f6;border:1px solid #2a3140}
+.btn-site.on{background:linear-gradient(90deg,#6366F1,#38BDF8);color:#0b0e16;border-color:transparent}
+.btn-site:disabled{opacity:.4;cursor:default}
+select,input[type="time"]{background:#10141b;color:#eef1f6;border:1px solid #232a36;border-radius:8px;padding:4px 6px;font-size:11px;color-scheme:dark;cursor:pointer}
+textarea{width:100%;background:#10141b;color:#c3cad9;border:1px solid #232a36;border-radius:8px;padding:6px;font-family:ui-monospace,Consolas,monospace;font-size:11px;resize:vertical;color-scheme:dark}
+textarea:focus{outline:none;border-color:#3f4bba}
+
+.color-row{display:flex;align-items:flex-end;gap:8px}
+.cwrap{display:flex;flex-direction:column;gap:4px;flex:1}
+.cwrap span{font-size:10px;color:#8b93a7}
+input[type="color"]{width:100%;height:24px;padding:0;border:1px solid #232a36;border-radius:7px;background:none;cursor:pointer}
+input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
+
+.preview{display:flex;gap:6px;flex-wrap:wrap}
+.preview .chip{font-size:10px;font-family:ui-monospace,Consolas,monospace;padding:3px 6px;border-radius:6px;border:1px solid #232a36;background:#10141b;color:#c3cad9}
+.chip{cursor:pointer;user-select:none;transition:all .15s}
+.chip:hover{background:#1b2130;border-color:#6366F1}
+
+details.card summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#eef1f6}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary::after{content:"▾";color:#8b93a7;transition:transform .2s}
+details.card[open] summary::after{transform:rotate(180deg)}
+details.card[open]>.card-body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+.group+.group{border-top:1px solid #20242e;padding-top:12px}
+.group-head{display:block;font-size:12px;font-weight:600;color:#c3cad9;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="main">
+
+<div class="header">
+<div class="logo" aria-hidden="true"></div>
+<h1>NightShift</h1>
+<button id="ns-reset">Reset</button>
+</div>
+
+<div class="card toggle-card">
+<div class="row">
+<div>
+<label for="ns-enabled" style="font-size:15px;font-weight:700">Night mode</label>
+<div class="muted" style="margin-top:3px">Bright websites turn dark, so your eyes rest easy.</div>
+</div>
+<label class="toggle big"><input type="checkbox" id="ns-enabled" checked><span class="slider"></span></label>
+</div>
+</div>
+
+<div class="card">
+<label style="display:block;margin-bottom:8px">This website</label>
+<div class="row">
+<label class="btn-site" id="ns-site">On this site: ON</label>
+<select id="ns-site-mode"><option value="">Default</option><option value="dark">Classic</option><option value="oled">Pure black</option><option value="dim">Soft</option></select>
+</div>
+<div class="muted" id="ns-host" style="margin-top:6px"></div>
+</div>
+
+<div class="card">
+<label style="display:block;margin-bottom:8px">Look</label>
+<div class="seg" id="ns-mode">
+<button data-value="dark">Classic</button>
+<button data-value="oled">Pure black</button>
+<button data-value="dim">Soft</button>
+</div>
+<div class="muted" style="margin-top:7px">Pure black is true black — great for OLED screens.</div>
+</div>
+
+<div class="card">
+<label style="display:block;margin-bottom:4px">Brightness</label>
+<div class="slider-row">
+<input type="range" id="ns-brightness" min="40" max="160" step="1" value="100">
+<span id="ns-brightness-val">100%</span>
+<button class="rst" id="ns-reset-brightness" title="Back to 100%">↺</button>
+</div>
+<div class="muted" style="margin-top:4px">Drag left for softer, right for brighter.</div>
+</div>
+
+<div class="card">
+<label style="display:block;margin-bottom:8px">Quick looks</label>
+<div class="preset-row">
+<button class="preset" data-preset="midnight"><span class="swatch" style="background:#121212"></span>Midnight</button>
+<button class="preset" data-preset="oled"><span class="swatch" style="background:#000000"></span>OLED</button>
+<button class="preset" data-preset="paper"><span class="swatch" style="background:#2A2515"></span>Warm</button>
+<button class="preset" data-preset="night"><span class="swatch" style="background:#1E1A0E"></span>Night</button>
+</div>
+</div>
+
+<details class="card">
+<summary>More settings</summary>
+<div class="card-body">
+
+<div class="group">
+<span class="group-head">Fine-tuning</span>
+<div class="slider-row"><label>Contrast</label><input type="range" id="ns-contrast" min="40" max="160" step="1" value="100"><span id="ns-contrast-val">100%</span><button class="rst" id="ns-reset-contrast" title="Back to 100%">↺</button></div>
+<div class="slider-row"><label>Warmth</label><input type="range" id="ns-warmth" min="0" max="100" step="1" value="0"><span id="ns-warmth-val">0%</span><button class="rst" id="ns-reset-warmth" title="Back to 0%">↺</button></div>
+<div class="muted">Warmth adds a cozy orange glow.</div>
+</div>
+
+<div class="group">
+<span class="group-head">Reading</span>
+<div class="slider-row"><label>Text size</label><input type="range" id="ns-font-size" min="85" max="130" step="1" value="100"><span id="ns-font-size-val">100%</span><button class="rst" id="ns-reset-font-size" title="Back to 100%">↺</button></div>
+<div class="preset-row"><button class="fs-chip" data-fs="85">S</button><button class="fs-chip" data-fs="100">M</button><button class="fs-chip" data-fs="115">L</button><button class="fs-chip" data-fs="130">XL</button></div>
+<div class="row"><label>Text style</label><select id="ns-font-family"><option value="system">System</option><option value="serif">Serif</option><option value="mono">Monospace</option></select></div>
+<div class="slider-row"><label>Spacing</label><input type="range" id="ns-line-height" min="130" max="190" step="1" value="160"><span id="ns-line-height-val">1.6</span><button class="rst" id="ns-reset-line-height" title="Back to 1.6">↺</button></div>
+</div>
+
+<div class="group">
+<span class="group-head">Customize</span>
+<div class="color-row">
+<label class="cwrap"><span>Background</span><input type="color" id="ns-custom-bg" value="#121212"></label>
+<label class="cwrap"><span>Text</span><input type="color" id="ns-custom-fg" value="#e6e6e6"></label>
+<label class="cwrap"><span>Accent</span><input type="color" id="ns-custom-accent" value="#8ab4f8"></label>
+<label class="cwrap"><span>Cards</span><input type="color" id="ns-custom-card" value="#1b1d21"></label>
+<button class="rst" id="ns-reset-colors" title="Reset colors">↺</button>
+</div>
+<div id="ns-preview" class="preview" style="margin-top:8px"></div>
+<div class="muted">Skip these — NightShift already looks good by itself.</div>
+</div>
+
+<div class="group">
+<span class="group-head">Advanced</span>
+<div class="row">
+<div>
+<label for="ns-schedule">Turn on automatically</label>
+<div class="muted" style="margin-top:2px">From <input type="time" id="ns-sched-start" value="20:00"> to <input type="time" id="ns-sched-end" value="06:00"></div>
+</div>
+<label class="toggle"><input type="checkbox" id="ns-schedule"><span class="slider"></span></label>
+</div>
+<div class="row">
+<label for="ns-media">Keep images looking normal</label>
+<label class="toggle"><input type="checkbox" id="ns-media" checked><span class="slider"></span></label>
+</div>
+<div class="row">
+<label for="ns-follow">Match device dark mode</label>
+<label class="toggle"><input type="checkbox" id="ns-follow"><span class="slider"></span></label>
+</div>
+<textarea id="ns-custom-css" rows="3" spellcheck="false" placeholder="Extra style for advanced users"></textarea>
+</div>
+
+</div>
+</details>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
