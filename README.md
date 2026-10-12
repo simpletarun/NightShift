@@ -31,14 +31,6 @@ Everything below is saved **per site**: changing a setting on one website never 
 - **Advanced** — auto-schedule (turn on automatically between set times) and custom CSS injection
 - **Reset** — the ↺ button in the *More settings* header returns this site's settings to their defaults
 
-### Shortcuts
-| Shortcut | Action |
-|---|---|
-| `Alt+Shift+D` | Toggle NightShift |
-| `Alt+Shift+M` | Cycle mode (Classic → Pure black → Soft) |
-| `Alt+Shift+S` | Toggle NightShift on this site |
-
-You can also right-click a page and use **Toggle NightShift on this page** / **Toggle on this site** from the context menu.
 
 ## Installation
 
@@ -48,43 +40,6 @@ You can also right-click a page and use **Toggle NightShift on this page** / **T
 4. Click **Load unpacked** and select the extracted `NightShift` folder
 5. Visit any website and click the NightShift icon — done
 
-## Usage
-
-1. Click the NightShift toolbar icon to open the popup
-2. Flip **Night mode** on
-3. Pick a **Look** and adjust **Brightness** to taste
-4. Browse anywhere — NightShift follows you automatically, and even watches live page changes (SPAs included)
-
-The toolbar badge shows `ON`/`OFF`, and the icon tooltip shows the active mode.
-
-## Development
-
-```
-File overview
-├── manifest.json        # MV3 manifest
-├── background.js        # Service worker: badge, shortcuts, context menu
-├── content.js           # Page theming engine (DOM walk + CSS variables)
-├── popup.html           # Popup UI
-├── popup.js             # Popup logic + live preview
-├── icons/               # 16/48/128 px icons
-└── tests/check.ps1      # Static validation suite
-```
-
-### Tests
-
-Run the static validation suite from the project root (PowerShell 5.1+):
-
-```powershell
-powershell -ExecutionPolicy Bypass -File tests\check.ps1
-```
-
-It validates:
-- `manifest.json` — version 3, permissions, content-script wiring, shortcuts
-- `content.js` / `background.js` / `popup.js` — required feature markers and banned legacy patterns
-- `popup.html` — required controls and no inline scripts
-- A `node --check` syntax pass on every script (skipped with a warning if Node.js isn't installed)
-
-All checks must end in `RESULT: PASS`.
 
 ## Privacy Policy
 
