@@ -49,23 +49,29 @@ chrome.runtime.onStartup.addListener(function () {
 });
 
 chrome.storage.onChanged.addListener(function (changes, area) {
-  if (area === "local" && (changes["nightshift.enabled"] || changes["nightshift.mode"] || changes["nightshift.siteOff"])) {
+  if (area === "local" && (changes["nightshift.enabled"] || changes["nightshift.mode"])) {
     updateBadge();
   }
 });
 
 chrome.commands.onCommand.addListener(function (command) {
   if (command === "toggle-nightshift") {
-    chrome.storage.local.get("nightshift.enabled", function (r) {
-      var next = r["nightshift.enabled"] === false;
-      chrome.storage.local.set({ "nightshift.enabled": next });
+    chrome.storage.local.get({ "nightshift.enabled": true }, function (r) {
+      chrome.storage.local.set({ "nightshift.enabled": !r["nightshift.enabled"] });
     });
   }
   if (command === "cycle-mode") {
-    chrome.storage.local.get({"nightshift.mode": "dark"}, function (d) {
-      var ring = ["dark", "oled", "dim"];
-      var i = ring.indexOf(d["nightshift.mode"]);
-      chrome.storage.local.set({"nightshift.mode": ring[(i + 1) % 3]});
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      var host = null;
+      try { host = tabs[0] && tabs[0].url ? new URL(tabs[0].url).hostname : null; } catch (e) { host = null; }
+      chrome.storage.local.get({ "nightshift.mode": "dark", "nightshift.siteModes": {} }, function (d) {
+        var ring = ["dark", "oled", "dim"];
+        var sm = d["nightshift.siteModes"] || {};
+        var cur = (host && sm[host]) || d["nightshift.mode"];
+        var next = ring[(ring.indexOf(cur) + 1) % ring.length];
+        if (host) { sm[host] = next; chrome.storage.local.set({ "nightshift.siteModes": sm }); }
+        else chrome.storage.local.set({ "nightshift.mode": next });
+      });
     });
   }
   if (command === "toggle-site") {

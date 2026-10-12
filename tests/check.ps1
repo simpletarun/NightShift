@@ -173,14 +173,14 @@ if (-not (Test-Path -LiteralPath $ContentPath)) {
         'nightshift\.brightness', 'nightshift\.contrast', 'nightshift\.warmth',
         'nightshift\.followSystem',
         'nightshift\.siteOff', 'prefers-color-scheme',
-        'siteModes', '\[location\.hostname\]',
-        'chrome\.storage\.onChanged', 'nightshift-invert', 'nightshift-icon-invert',
+        'siteModes', '\[location\.hostname\]', 'nightshift\.siteOverrides',
+        'chrome\.storage\.onChanged', 'nightshift-icon-invert',
         'nightshift\.fontSize', 'nightshift\.fontFamily', 'nightshift\.lineHeight',
         'nightshift\.customCss', 'nightshift\.customBg', 'nightshift\.customCard', '--ns-font-scale', '--ns-line-height', 'nightshift-custom',
         'transition:background-color', 'rgba\(16,16,16,0\.45\)',
         'adjBg', 'adjFg', 'card:\s*\[', '--ns-card',
         'color-mix',
-        'STRUCTURAL_KEYS', 'applyTint', 'var\(--ns-card\)', 'getState',
+        'STRUCTURAL_KEYS', 'OVERRIDE_KEYS', 'applyTint', 'var\(--ns-card\)', 'getState',
         '!state\.protectMedia', 'themeSurfaces\(state\)',
         'transition:background-color \.15s ease',
         'MutationObserver', 'watchDom', 'scrollbar-color:\#3A3D44 \#121212',
@@ -251,7 +251,7 @@ if (-not (Test-Path -LiteralPath $PopupHtmlPath)) {
     }
 
     $htmlContent = Get-Content -LiteralPath $PopupHtmlPath -Raw
-    foreach ($marker in @('min="40"', 'max="160"', 'true black', 'ns-schedule', 'ns-sched-start', 'ns-sched-end', 'type="time"', 'data-preset="midnight"', 'data-preset="paper"', 'ns-site-mode', 'ns-reset-brightness', 'ns-reset-contrast', 'ns-reset-warmth', 'scrollbar-color', '.swatch', 'button:hover', 'ns-font-size', 'ns-font-family', 'ns-line-height', 'ns-custom-bg', 'ns-custom-card', 'ns-custom-css', 'type="color"', 'Reading', 'Customize', 'fs-chip', 'data-fs')) {
+    foreach ($marker in @('min="40"', 'max="160"', 'true black', 'ns-schedule', 'ns-sched-start', 'ns-sched-end', 'type="time"', 'ns-site-mode', 'ns-reset-brightness', 'ns-reset-contrast', 'ns-reset-warmth', 'ns-reset-more', 'scrollbar-color', 'button:hover', 'ns-font-size', 'ns-font-family', 'ns-line-height', 'ns-custom-bg', 'ns-custom-card', 'ns-custom-css', 'type="color"', 'Reading', 'Customize', 'fs-chip', 'data-fs')) {
         if ($htmlContent -match [regex]::Escape($marker)) {
             Pass "popup.html contains $marker"
         } else {
@@ -287,13 +287,12 @@ if (-not (Test-Path -LiteralPath $PopupJsPath)) {
         'nightshift\.followSystem',
         'nightshift\.siteOff', 'chrome\.tabs\.query',
         'siteModes', 'ns-site-mode',
-        'adjBg', 'renderPreview',
-        'state\s*=\s*d;', 'renderPreview\(state\)',
-        'PRESETS', 'nightshift\.scheduleOn', 'nightshift\.scheduleStart',
-        'nightshift\.scheduleEnd', 'paper:\{',
+        'adjBg', 'siteOverrides', 'setSite', 'clearSite',
+        'nightshift\.scheduleOn', 'nightshift\.scheduleStart',
+        'nightshift\.scheduleEnd',
         'nightshift\.fontSize', 'nightshift\.fontFamily', 'nightshift\.lineHeight',
         'nightshift\.customCss', 'nightshift\.customCard', 'paletteOf', '\.fs-chip',
-        'data-hex', 'fallbackCopy', 'Copied', 'ns-reset-brightness',
+        'ns-reset-brightness',
         'pending\s*=\s*2', 'disabled=true;cb\(\);return'
     )
     $labels = $patterns | ForEach-Object { $_ -replace '\\\.', '.' -replace '\\\(', '(' -replace '\\\)', ')' -replace '\\\[', '[' -replace '\\\]', ']' }

@@ -9,8 +9,8 @@ Built for Chrome and Edge, Manifest V3, no dependencies, no network access.
 - **Eye-friendly reading** — a real dark theme, not a filter/inversion; text stays sharp and readable
 - **Three modes** — *Classic* (balanced), *Pure black* (OLED, true black), *Soft* (low-light contrast)
 - **DOM-aware theming** — inspects the page and darkens cards, gradients, and light surfaces while protecting logos, images, and media
-- **Simple by default** — one big **Night mode** switch, a **Look** picker, a **Brightness** slider, and one-tap **Quick looks**
-- **Everything a power user wants** — show **More settings** for per-site control, contrast, warmth, text size/style/spacing, custom colors, auto schedule, and custom CSS
+- **Simple by default** — one big **Night mode** switch, a **Look** picker, and a **Brightness** slider
+- **Per-site by default** — tone, brightness, contrast, warmth, text, and colors are saved per website, so tweaking one site never affects another
 - **Privacy-first** — no network requests, no analytics, no remote code. All settings live in `chrome.storage.local`
 - **Free forever** — no premium tiers, no trials, no limits
 
@@ -19,15 +19,17 @@ Built for Chrome and Edge, Manifest V3, no dependencies, no network access.
 ### Main popup
 - **Night mode** master switch
 - **This website** — turn NightShift on/off for the current site, or force a mode for it
-- **Look** — Classic / Pure black / Soft
-- **Brightness** — live page dimming, drag left for softer, right for brighter
-- **Quick looks** — Midnight, OLED, Warm, and Night one-tap presets
+- **Look** — Classic / Pure black / Soft, saved for the current site
+- **Brightness** — live page dimming, drag left for softer, right for brighter, saved for the current site
+
+Everything below is saved **per site**: changing a setting on one website never changes another. Sites you have not customised use the built-in defaults.
 
 ### More settings
 - **Contrast** and **Warmth** fine-tuning sliders
 - **Reading** — text size, font family (System/Serif/Monospace), line spacing
-- **Customize** — background, text, accent, and card colors plus a live color palette (click a chip to copy its hex)
-- **Advanced** — auto-schedule (turn on automatically between set times), keep-images-normal toggle, match-device-dark-mode toggle, and custom CSS injection
+- **Customize** — background, text, accent, and card colors
+- **Advanced** — auto-schedule (turn on automatically between set times) and custom CSS injection
+- **Reset** — the ↺ button in the *More settings* header returns this site's settings to their defaults
 
 ### Shortcuts
 | Shortcut | Action |

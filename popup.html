@@ -5,171 +5,232 @@
 <title>NightShift</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{scrollbar-color:#2a3040 #0f1115}
+html{scrollbar-color:#3a2f22 #0e0c0b}
 html::-webkit-scrollbar{width:10px}
-html::-webkit-scrollbar-track{background:#0f1115}
-html::-webkit-scrollbar-thumb{background:#2a3040;border-radius:6px;border:2px solid #0f1115}
-body{color:#eef1f6;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;width:340px;background:#0f1115}
-.main{padding:14px;display:flex;flex-direction:column;gap:9px}
-button{font-family:inherit;cursor:pointer}
-button:hover{transition:color .15s,background .15s,border-color .15s,transform .15s}
-button:not(:disabled):active{transform:scale(.98)}
-button:focus-visible{outline:2px solid #6366F1;outline-offset:1px}
+html::-webkit-scrollbar-track{background:#0e0c0b}
+html::-webkit-scrollbar-thumb{background:#3a2f22;border-radius:6px;border:2px solid #0e0c0b}
+body{color:#FDF8F0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;width:340px;background:#0E0C0B}
+.main{padding:12px;display:flex;flex-direction:column;gap:9px;position:relative;overflow:hidden}
+.main::before{content:"";position:absolute;top:-56px;left:-48px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.22),transparent 70%);filter:blur(24px);pointer-events:none;z-index:0}
+.main::after{content:"";position:absolute;bottom:16px;right:-56px;width:176px;height:176px;border-radius:50%;background:radial-gradient(circle,rgba(217,119,6,.18),transparent 70%);filter:blur(24px);pointer-events:none;z-index:0}
+.main>*{position:relative;z-index:1}
+button{font-family:inherit;cursor:pointer;transition:color .15s,background .15s,border-color .15s,transform .15s}
+button:not(:disabled):active{transform:scale(.97)}
+button:focus-visible{outline:2px solid #F59E0B;outline-offset:1px}
 
-.header{display:flex;align-items:center;gap:8px}
-.logo{position:relative;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);box-shadow:0 2px 8px rgba(99,102,241,.35);flex-shrink:0}
-.logo::after{content:"";position:absolute;top:4px;left:9px;width:19px;height:19px;border-radius:50%;background:#0f1115}
-h1{font-size:15px;font-weight:700;letter-spacing:.2px;margin-right:auto}
-#ns-reset{background:#171b22;border:1px solid #232a36;color:#8b93a7;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600}
-#ns-reset:hover{color:#fff;border-color:#6366F1}
+.header{display:flex;align-items:center;gap:9px;padding:2px 2px 0}
+.logo{width:34px;height:34px;border-radius:13px;background:linear-gradient(135deg,#FBBF24,#D97706 55%,#78350F);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(217,119,6,.35);border:1px solid rgba(252,211,77,.35);color:#0C0A09;flex-shrink:0}
+.logo svg{width:17px;height:17px}
+.brand{display:flex;flex-direction:column;margin-right:auto;min-width:0}
+.brand-top{display:flex;align-items:center;gap:7px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:400;letter-spacing:.2px;color:#FDFCF7;line-height:1.05}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:999px;font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#FBBF24;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.3)}
+.pill i{width:5px;height:5px;border-radius:50%;background:#FBBF24;animation:ns-pulse 2s infinite}
+@keyframes ns-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tagline{font-size:10px;color:rgba(186,169,147,.8);letter-spacing:.03em;margin-top:2px}
+#ns-reset{background:transparent;border:1px solid transparent;color:#BAA993;border-radius:11px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#ns-reset:hover{color:#FDF8F0;background:rgba(255,255,255,.05)}
+#ns-reset svg{width:16px;height:16px}
 
-.card{background:#171b22;border:1px solid #232a36;border-radius:12px;padding:12px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-label{font-size:13px;color:#eef1f6;cursor:pointer}
-.muted{font-size:11px;color:#8b93a7;line-height:1.5}
+.card{background:linear-gradient(165deg,rgba(26,22,20,.9),rgba(18,15,14,.95));border:1px solid rgba(245,222,179,.09);border-radius:18px;padding:13px;box-shadow:inset 0 1px 1px rgba(255,248,240,.06),0 10px 24px -10px rgba(0,0,0,.6)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+label{font-size:13px;color:#FDF8F0;cursor:pointer}
+.muted{font-size:11px;color:rgba(186,169,147,.85);line-height:1.5}
+
+.master{border-color:rgba(245,158,11,.3)}
+.master-title{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:#FDF8F0}
+.master-title .dot{width:8px;height:8px;border-radius:50%;background:#FBBF24;box-shadow:0 0 12px rgba(245,158,11,.75);transition:background .2s,box-shadow .2s}
+.master:not(:has(#ns-enabled:checked)) .dot{background:#57534e;box-shadow:none}
+.master .lbl-off{display:none}
+.master:not(:has(#ns-enabled:checked)) .lbl-on{display:none}
+.master:not(:has(#ns-enabled:checked)) .lbl-off{display:inline}
 
 .toggle{position:relative;width:40px;height:22px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0;position:absolute}
-.toggle .slider{position:absolute;inset:0;background:#232a36;border-radius:11px;cursor:pointer;transition:background .2s}
-.toggle .slider::after{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#8b93a7;border-radius:50%;transition:transform .2s,background .2s}
-.toggle input:checked+.slider{background:linear-gradient(90deg,#6366F1,#38BDF8)}
-.toggle input:checked+.slider::after{transform:translateX(18px);background:#fff}
-.toggle input:focus-visible+.slider{box-shadow:0 0 0 3px rgba(99,102,241,.4)}
-.toggle.big{width:48px;height:27px}
-.toggle.big .slider{border-radius:14px}
-.toggle.big .slider::after{width:21px;height:21px;top:3px;left:3px}
+.toggle .slider{position:absolute;inset:0;background:#0C0A09;border:1px solid rgba(180,83,9,.5);border-radius:999px;cursor:pointer;transition:background .2s,border-color .2s;box-shadow:inset 0 2px 4px rgba(0,0,0,.7),inset 0 -1px 2px rgba(255,255,255,.06)}
+.toggle .slider::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:linear-gradient(#FFF9EE,#EBD5B3);border:1px solid #FDE68A;box-shadow:0 2px 6px rgba(0,0,0,.6);transition:transform .25s ease,background .2s}
+.toggle input:checked+.slider{background:linear-gradient(90deg,#78350F,#D97706);border-color:rgba(251,191,36,.6)}
+.toggle input:checked+.slider::after{transform:translateX(18px)}
+.toggle input:focus-visible+.slider{box-shadow:0 0 0 3px rgba(245,158,11,.35)}
+.toggle.big{width:50px;height:29px}
+.toggle.big .slider::after{width:22px;height:22px}
 .toggle.big input:checked+.slider::after{transform:translateX(21px)}
-.toggle-card:has(#ns-enabled:checked){border-color:#3a4260;box-shadow:0 0 0 1px rgba(99,102,241,.18)}
 
-.seg{display:flex;gap:5px;background:#10141b;border:1px solid #232a36;border-radius:11px;padding:4px}
-.seg button{flex:1;padding:9px 0;background:transparent;color:#8b93a7;border:1px solid transparent;border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:600;transition:all .15s}
-.seg button:hover{color:#eef1f6;background:#1f2632}
-.seg button.active{background:#242e52;color:#aab6ff;border-color:#3f4bba}
-
-.preset-row{display:flex;gap:6px}
-.preset{display:flex;gap:6px;align-items:center;justify-content:center;flex:1;padding:8px 0;background:#10141b;border:1px solid #232a36;border-radius:10px;color:#c3cad9;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
-.preset:hover{background:#1b2130;border-color:#6366F1;color:#fff}
-.swatch{width:11px;height:11px;border-radius:4px;border:1px solid rgba(255,255,255,.25);flex:none}
-
-.slider-row{display:flex;align-items:center;gap:8px}
-.slider-row label{min-width:56px;font-size:11px;color:#8b93a7}
-.slider-row span{font-size:10.5px;color:#8b93a7;min-width:32px;text-align:right;background:#10141b;border:1px solid #232a36;border-radius:7px;padding:2px 5px;font-variant-numeric:tabular-nums}
-.rst{background:transparent;border:1px solid #2a3140;color:#8b93a7;border-radius:7px;cursor:pointer;font-size:11px;line-height:1;padding:5px 7px;flex-shrink:0}
-.rst:hover{color:#aab6ff;border-color:#6366F1;background:rgba(99,102,241,.08)}
-
-input[type="range"]{-webkit-appearance:none;appearance:none;flex:1;height:18px;background:transparent;cursor:pointer}
-input[type="range"]::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:#262c38}
-input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;background:#eef1f6;border:none;box-shadow:0 1px 4px rgba(0,0,0,.5);transition:transform .15s}
-input[type="range"]:hover::-webkit-slider-thumb{transform:scale(1.15)}
-input[type="range"]:focus-visible{outline:none}
-input[type="range"]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(99,102,241,.45)}
-
-.fs-chip{flex:1;background:#10141b;border:1px solid #232a36;border-radius:8px;color:#c3cad9;cursor:pointer;font-size:11px;font-weight:600;padding:5px 0;transition:all .15s}
-.fs-chip:hover,.fs-chip.active{background:#1b2130;border-color:#6366F1;color:#fff}
-
-.btn-site{flex:1;text-align:left;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;background:#1c212c;color:#eef1f6;border:1px solid #2a3140}
-.btn-site.on{background:linear-gradient(90deg,#6366F1,#38BDF8);color:#0b0e16;border-color:transparent}
+.site-row{display:flex;align-items:center;gap:8px}
+.favicon{width:28px;height:28px;border-radius:10px;background:#141110;border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;color:#FBBF24;flex-shrink:0}
+.favicon svg{width:15px;height:15px}
+.site-info{min-width:0;margin-right:auto}
+.site-name{font-size:12px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site-note{font-size:10px;color:#FBBF24;font-weight:500}
+.btn-site{flex-shrink:0;font-size:11px;font-weight:600;padding:5px 11px;border-radius:8px;background:#0C0A09;color:#BAA993;border:1px solid rgba(255,255,255,.07);display:inline-flex;align-items:center;gap:6px}
+.btn-site::before{content:"";width:6px;height:6px;border-radius:50%;background:#78716c;flex:none}
+.btn-site:hover{background:rgba(26,22,20,.95)}
+.btn-site.on{background:rgba(245,158,11,.16);color:#FCD34D;border-color:rgba(245,158,11,.35)}
+.btn-site.on::before{background:#FBBF24}
 .btn-site:disabled{opacity:.4;cursor:default}
-select,input[type="time"]{background:#10141b;color:#eef1f6;border:1px solid #232a36;border-radius:8px;padding:4px 6px;font-size:11px;color-scheme:dark;cursor:pointer}
-textarea{width:100%;background:#10141b;color:#c3cad9;border:1px solid #232a36;border-radius:8px;padding:6px;font-family:ui-monospace,Consolas,monospace;font-size:11px;resize:vertical;color-scheme:dark}
-textarea:focus{outline:none;border-color:#3f4bba}
+#ns-site-mode{width:100%;margin-top:8px}
+
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 2px}
+.sec-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#BAA993}
+.look-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+#ns-mode button{display:flex;align-items:center;gap:10px;text-align:left;padding:9px;border-radius:13px;border:1px solid rgba(255,255,255,.05);background:rgba(20,17,16,.8);transition:all .15s}
+#ns-mode button .ic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.08);background:#141110;color:#E6D9C5}
+#ns-mode button .ic svg{width:16px;height:16px}
+#ns-mode button .tx{display:block;min-width:0}
+#ns-mode button .tt{display:block;font-size:12px;font-weight:600;color:#F5EDE0;line-height:1.15}
+#ns-mode button .st{display:block;font-size:10px;color:rgba(186,169,147,.85)}
+#ns-mode button:hover{border-color:rgba(255,255,255,.12);background:rgba(26,22,20,.92)}
+#ns-mode button.active{border-color:rgba(245,158,11,.7);background:linear-gradient(135deg,rgba(69,26,3,.5),rgba(20,17,16,.9));box-shadow:0 0 18px -4px rgba(245,158,11,.5),0 0 0 1px rgba(251,191,36,.35)}
+#ns-mode button.active .ic{background:rgba(120,53,15,.8);border-color:rgba(245,158,11,.45);color:#FBBF24}
+
+.bright-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.badge,.slider-row span{display:inline-flex;align-items:center;justify-content:flex-end;height:20px;min-width:44px;font-size:11px;font-variant-numeric:tabular-nums;color:#FDF8F0;background:#100E0D;border:1px solid rgba(245,222,179,.14);border-radius:8px;padding:0 8px;white-space:nowrap}
+.slider-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.slider-row label{min-width:54px;font-size:11.5px;color:#D6C7B0}
+.slider-row svg{width:15px;height:15px;flex:none}
+.ic-dim{color:rgba(186,169,147,.6)}
+.ic-bright{color:#FBBF24}
+.rst{display:inline-flex;align-items:center;justify-content:center;height:20px;min-width:24px;font-size:12px;line-height:1;padding:0 6px;background:transparent;border:1px solid rgba(245,222,179,.14);color:#BAA993;border-radius:8px;cursor:pointer;flex:none}
+.rst:hover{color:#FCD34D;border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.08)}
+
+input[type="range"]{-webkit-appearance:none;appearance:none;flex:1;height:20px;background:transparent;cursor:pointer}
+input[type="range"]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:#231E1B;border:1px solid rgba(255,255,255,.04)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:linear-gradient(135deg,#FFF8EC,#F5DEB3);border:2px solid #F59E0B;box-shadow:0 0 12px rgba(245,158,11,.6),0 3px 6px rgba(0,0,0,.6);transition:transform .15s,box-shadow .15s}
+input[type="range"]:hover::-webkit-slider-thumb{transform:scale(1.14)}
+input[type="range"]:focus-visible{outline:none}
+input[type="range"]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(245,158,11,.4)}
+
+.chip-row{display:flex;gap:8px}
+
+.fs-chip{flex:1;background:rgba(20,17,16,.8);border:1px solid rgba(255,255,255,.06);border-radius:8px;color:#E6D9C5;cursor:pointer;font-size:11px;font-weight:600;padding:6px 0;transition:all .15s}
+.fs-chip:hover,.fs-chip.active{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.5);color:#FFF8EC}
+
+select,input[type="time"]{background:#100E0D;color:#F5EDE0;border:1px solid rgba(245,222,179,.12);border-radius:8px;padding:5px 7px;font-size:11px;color-scheme:dark;cursor:pointer}
+select:disabled{opacity:.4;cursor:default}
+#ns-font-family{width:132px}
+textarea{width:100%;background:#100E0D;color:#E6D9C5;border:1px solid rgba(245,222,179,.12);border-radius:10px;padding:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;resize:vertical;color-scheme:dark}
+textarea:focus{outline:none;border-color:rgba(245,158,11,.5)}
 
 .color-row{display:flex;align-items:flex-end;gap:8px}
-.cwrap{display:flex;flex-direction:column;gap:4px;flex:1}
-.cwrap span{font-size:10px;color:#8b93a7}
-input[type="color"]{width:100%;height:24px;padding:0;border:1px solid #232a36;border-radius:7px;background:none;cursor:pointer}
+.color-row .rst{height:26px}
+.cwrap{display:flex;flex-direction:column;gap:5px;flex:1}
+.cwrap span{font-size:10.5px;color:#BAA993}
+input[type="color"]{width:100%;height:26px;padding:0;border:1px solid rgba(245,222,179,.14);border-radius:8px;background:none;cursor:pointer}
 input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
-input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
+input[type="color"]::-webkit-color-swatch{border:none;border-radius:5px}
 
-.preview{display:flex;gap:6px;flex-wrap:wrap}
-.preview .chip{font-size:10px;font-family:ui-monospace,Consolas,monospace;padding:3px 6px;border-radius:6px;border:1px solid #232a36;background:#10141b;color:#c3cad9}
-.chip{cursor:pointer;user-select:none;transition:all .15s}
-.chip:hover{background:#1b2130;border-color:#6366F1}
-
-details.card summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#eef1f6}
+details.card summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#F5EDE0}
 details.card summary::-webkit-details-marker{display:none}
-details.card summary::after{content:"▾";color:#8b93a7;transition:transform .2s}
+details.card summary::after{content:"▾";color:#BAA993;transition:transform .2s}
+#ns-reset-more{margin-left:auto}
 details.card[open] summary::after{transform:rotate(180deg)}
 details.card[open]>.card-body{margin-top:12px;display:flex;flex-direction:column;gap:12px}
-.group+.group{border-top:1px solid #20242e;padding-top:12px}
-.group-head{display:block;font-size:12px;font-weight:600;color:#c3cad9;margin-bottom:8px}
+.group+.group{border-top:1px solid rgba(245,222,179,.08);padding-top:12px}
+.group-head{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#D6BFA0;margin-bottom:9px}
 </style>
 </head>
 <body>
 <div class="main">
 
-<div class="header">
-<div class="logo" aria-hidden="true"></div>
-<h1>NightShift</h1>
-<button id="ns-reset">Reset</button>
+<header class="header">
+<div class="logo" aria-hidden="true">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 0 0 11.5-11.5c-3.3.4-6.6-.7-8.7-2.8A7.8 7.8 0 0 1 12.3 2z"/></svg>
 </div>
+<div class="brand">
+<div class="brand-top">
+<h1>NightShift</h1>
+<span class="pill"><i></i>Circadian</span>
+</div>
+<span class="tagline">Nordic Twilight Ambient</span>
+</div>
+<button id="ns-reset" title="Reset settings" aria-label="Reset settings">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+</button>
+</header>
 
-<div class="card toggle-card">
+<section class="card master">
 <div class="row">
 <div>
-<label for="ns-enabled" style="font-size:15px;font-weight:700">Night mode</label>
-<div class="muted" style="margin-top:3px">Bright websites turn dark, so your eyes rest easy.</div>
+<div class="master-title">
+<span class="dot"></span>
+<span class="lbl-on">Night Shift Active</span>
+<span class="lbl-off">Night Shift Paused</span>
+</div>
+<p class="muted" style="margin-top:3px">Softening blue spectrum · Circadian comfort</p>
 </div>
 <label class="toggle big"><input type="checkbox" id="ns-enabled" checked><span class="slider"></span></label>
 </div>
-</div>
+</section>
 
-<div class="card">
-<label style="display:block;margin-bottom:8px">This website</label>
-<div class="row">
-<label class="btn-site" id="ns-site">On this site: ON</label>
+<section class="card">
+<div class="site-row">
+<div class="favicon" aria-hidden="true">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke-linecap="round"/></svg>
+</div>
+<div class="site-info">
+<div class="site-name" id="ns-host"></div>
+<div class="site-note">Per-site twilight tone</div>
+</div>
+<button type="button" class="btn-site" id="ns-site">On this site: ON</button>
+</div>
 <select id="ns-site-mode"><option value="">Default</option><option value="dark">Classic</option><option value="oled">Pure black</option><option value="dim">Soft</option></select>
-</div>
-<div class="muted" id="ns-host" style="margin-top:6px"></div>
-</div>
+</section>
 
-<div class="card">
-<label style="display:block;margin-bottom:8px">Look</label>
-<div class="seg" id="ns-mode">
-<button data-value="dark">Classic</button>
-<button data-value="oled">Pure black</button>
-<button data-value="dim">Soft</button>
+<section>
+<div class="sec-head">
+<span class="sec-title">Look</span>
+<span class="muted">this site only</span>
+</div>
+<div class="look-list" id="ns-mode">
+<button data-value="dark">
+<span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 0 0 11.5-11.5c-3.3.4-6.6-.7-8.7-2.8A7.8 7.8 0 0 1 12.3 2z"/></svg></span>
+<span class="tx"><span class="tt">Classic</span><span class="st">Balanced warm dark</span></span>
+</button>
+<button data-value="oled">
+<span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></span>
+<span class="tx"><span class="tt">Pure black</span><span class="st">True zero-black for OLED</span></span>
+</button>
+<button data-value="dim">
+<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span>
+<span class="tx"><span class="tt">Soft</span><span class="st">Gentle reading tint</span></span>
+</button>
 </div>
 <div class="muted" style="margin-top:7px">Pure black is true black — great for OLED screens.</div>
-</div>
+</section>
 
-<div class="card">
-<label style="display:block;margin-bottom:4px">Brightness</label>
+<section class="card">
+<div class="bright-head">
+<div>
+<label for="ns-brightness">Brightness</label>
+<p class="muted">Softer to the left, brighter to the right</p>
+</div>
+<span class="badge" id="ns-brightness-val">100%</span>
+</div>
 <div class="slider-row">
+<svg class="ic-dim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <input type="range" id="ns-brightness" min="40" max="160" step="1" value="100">
-<span id="ns-brightness-val">100%</span>
-<button class="rst" id="ns-reset-brightness" title="Back to 100%">↺</button>
+<svg class="ic-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+<button class="rst" id="ns-reset-brightness" title="Back to 100%" aria-label="Reset brightness to 100%">↺</button>
 </div>
-<div class="muted" style="margin-top:4px">Drag left for softer, right for brighter.</div>
-</div>
-
-<div class="card">
-<label style="display:block;margin-bottom:8px">Quick looks</label>
-<div class="preset-row">
-<button class="preset" data-preset="midnight"><span class="swatch" style="background:#121212"></span>Midnight</button>
-<button class="preset" data-preset="oled"><span class="swatch" style="background:#000000"></span>OLED</button>
-<button class="preset" data-preset="paper"><span class="swatch" style="background:#2A2515"></span>Warm</button>
-<button class="preset" data-preset="night"><span class="swatch" style="background:#1E1A0E"></span>Night</button>
-</div>
-</div>
+</section>
 
 <details class="card">
-<summary>More settings</summary>
+<summary><span>More settings</span><button class="rst" type="button" id="ns-reset-more" title="Reset more settings" aria-label="Reset more settings">↺</button></summary>
 <div class="card-body">
 
 <div class="group">
 <span class="group-head">Fine-tuning</span>
-<div class="slider-row"><label>Contrast</label><input type="range" id="ns-contrast" min="40" max="160" step="1" value="100"><span id="ns-contrast-val">100%</span><button class="rst" id="ns-reset-contrast" title="Back to 100%">↺</button></div>
-<div class="slider-row"><label>Warmth</label><input type="range" id="ns-warmth" min="0" max="100" step="1" value="0"><span id="ns-warmth-val">0%</span><button class="rst" id="ns-reset-warmth" title="Back to 0%">↺</button></div>
+<div class="slider-row"><label for="ns-contrast">Contrast</label><input type="range" id="ns-contrast" min="40" max="160" step="1" value="100"><span id="ns-contrast-val">100%</span><button class="rst" id="ns-reset-contrast" title="Back to 100%" aria-label="Reset contrast to 100%">↺</button></div>
+<div class="slider-row"><label for="ns-warmth">Warmth</label><input type="range" id="ns-warmth" min="0" max="100" step="1" value="0"><span id="ns-warmth-val">0%</span><button class="rst" id="ns-reset-warmth" title="Back to 0%" aria-label="Reset warmth to 0%">↺</button></div>
 <div class="muted">Warmth adds a cozy orange glow.</div>
 </div>
 
 <div class="group">
 <span class="group-head">Reading</span>
-<div class="slider-row"><label>Text size</label><input type="range" id="ns-font-size" min="85" max="130" step="1" value="100"><span id="ns-font-size-val">100%</span><button class="rst" id="ns-reset-font-size" title="Back to 100%">↺</button></div>
-<div class="preset-row"><button class="fs-chip" data-fs="85">S</button><button class="fs-chip" data-fs="100">M</button><button class="fs-chip" data-fs="115">L</button><button class="fs-chip" data-fs="130">XL</button></div>
-<div class="row"><label>Text style</label><select id="ns-font-family"><option value="system">System</option><option value="serif">Serif</option><option value="mono">Monospace</option></select></div>
-<div class="slider-row"><label>Spacing</label><input type="range" id="ns-line-height" min="130" max="190" step="1" value="160"><span id="ns-line-height-val">1.6</span><button class="rst" id="ns-reset-line-height" title="Back to 1.6">↺</button></div>
+<div class="slider-row"><label for="ns-font-size">Text size</label><input type="range" id="ns-font-size" min="85" max="130" step="1" value="100"><span id="ns-font-size-val">100%</span><button class="rst" id="ns-reset-font-size" title="Back to 100%" aria-label="Reset text size to 100%">↺</button></div>
+<div class="chip-row"><button class="fs-chip" data-fs="85">S</button><button class="fs-chip" data-fs="100">M</button><button class="fs-chip" data-fs="115">L</button><button class="fs-chip" data-fs="130">XL</button></div>
+<div class="row" style="margin-top:9px"><label for="ns-font-family">Text style</label><select id="ns-font-family"><option value="system">System</option><option value="serif">Serif</option><option value="mono">Monospace</option></select></div>
+<div class="slider-row"><label for="ns-line-height">Spacing</label><input type="range" id="ns-line-height" min="130" max="190" step="1" value="160"><span id="ns-line-height-val">1.6</span><button class="rst" id="ns-reset-line-height" title="Back to 1.6" aria-label="Reset spacing to 1.6">↺</button></div>
 </div>
 
 <div class="group">
@@ -179,10 +240,8 @@ details.card[open]>.card-body{margin-top:12px;display:flex;flex-direction:column
 <label class="cwrap"><span>Text</span><input type="color" id="ns-custom-fg" value="#e6e6e6"></label>
 <label class="cwrap"><span>Accent</span><input type="color" id="ns-custom-accent" value="#8ab4f8"></label>
 <label class="cwrap"><span>Cards</span><input type="color" id="ns-custom-card" value="#1b1d21"></label>
-<button class="rst" id="ns-reset-colors" title="Reset colors">↺</button>
+<button class="rst" id="ns-reset-colors" title="Reset colors" aria-label="Reset custom colors">↺</button>
 </div>
-<div id="ns-preview" class="preview" style="margin-top:8px"></div>
-<div class="muted">Skip these — NightShift already looks good by itself.</div>
 </div>
 
 <div class="group">
@@ -193,14 +252,6 @@ details.card[open]>.card-body{margin-top:12px;display:flex;flex-direction:column
 <div class="muted" style="margin-top:2px">From <input type="time" id="ns-sched-start" value="20:00"> to <input type="time" id="ns-sched-end" value="06:00"></div>
 </div>
 <label class="toggle"><input type="checkbox" id="ns-schedule"><span class="slider"></span></label>
-</div>
-<div class="row">
-<label for="ns-media">Keep images looking normal</label>
-<label class="toggle"><input type="checkbox" id="ns-media" checked><span class="slider"></span></label>
-</div>
-<div class="row">
-<label for="ns-follow">Match device dark mode</label>
-<label class="toggle"><input type="checkbox" id="ns-follow"><span class="slider"></span></label>
 </div>
 <textarea id="ns-custom-css" rows="3" spellcheck="false" placeholder="Extra style for advanced users"></textarea>
 </div>

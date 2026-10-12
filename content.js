@@ -7,10 +7,12 @@
     "nightshift.siteOff", "nightshift.warmth",
     "nightshift.scheduleOn","nightshift.scheduleStart","nightshift.scheduleEnd",
     "nightshift.siteModes",
+    "nightshift.siteOverrides",
     "nightshift.fontSize","nightshift.fontFamily","nightshift.lineHeight",
     "nightshift.customCss","nightshift.customBg","nightshift.customFg","nightshift.customAccent","nightshift.customCard"
   ];
   var STRUCTURAL_KEYS = ["nightshift.enabled","nightshift.mode","nightshift.protectMedia","nightshift.followSystem","nightshift.siteOff","nightshift.scheduleOn","nightshift.scheduleStart","nightshift.scheduleEnd","nightshift.siteModes","nightshift.customCss"];
+  var OVERRIDE_KEYS = ["brightness","contrast","warmth","fontSize","fontFamily","lineHeight","customBg","customFg","customAccent","customCard","customCss"];
   var DEFAULTS = {
     enabled: true, mode: "dark", protectMedia: true,
     brightness: 1.0, contrast: 1.0, followSystem: false,
@@ -159,10 +161,8 @@
       if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
       return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16), a: 1 };
     }
-    m = str.match(/hsl\(\s*([\d.]+)[,\s]\s*([\d.]+)%[,\s]\s*([\d.]+)%\s*\)/);
-    if (m) { var c = hslRgb(parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])); return { r: c[0], g: c[1], b: c[2], a: 1 }; }
-    m = str.match(/oklch\(\s*([\d.]+)%?\s/);
-    if (m) { var L1 = m[1].indexOf("%") > -1 ? parseFloat(m[1]) / 100 : parseFloat(m[1]); return { r: L1 * 255, g: L1 * 255, b: L1 * 255, a: 1 }; }
+    m = str.match(/oklch\(\s*([\d.]+)(%?)\s/);
+    if (m) { var L1 = m[2] === "%" ? parseFloat(m[1]) / 100 : parseFloat(m[1]); return { r: L1 * 255, g: L1 * 255, b: L1 * 255, a: 1 }; }
     m = str.match(/lab\(\s*([\d.]+)\s/);
     if (m) { var L2 = Math.min(100, parseFloat(m[1])) / 100; return { r: L2 * 255, g: L2 * 255, b: L2 * 255, a: 1 }; }
     m = str.match(/color\(\s*srgb\s+([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+%?)/);
@@ -180,20 +180,6 @@
       a: m[4] !== undefined ? (m[4].indexOf("%") > -1 ? parseFloat(m[4]) / 100 : parseFloat(m[4])) : 1
     };
   }
-  function hslRgb(h, s, l) {
-    h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
-    var c = (1 - Math.abs(2 * l - 1)) * s;
-    var x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    var m = l - c / 2, rgb;
-    if (h < 60) rgb = [c, x, 0];
-    else if (h < 120) rgb = [x, c, 0];
-    else if (h < 180) rgb = [0, c, x];
-    else if (h < 240) rgb = [0, x, c];
-    else if (h < 300) rgb = [x, 0, c];
-    else rgb = [c, 0, x];
-    return [Math.round((rgb[0] + m) * 255), Math.round((rgb[1] + m) * 255), Math.round((rgb[2] + m) * 255)];
-  }
-
   function luminance(r, g, b) {
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
   }
@@ -207,7 +193,6 @@
       surfaces[i].style.color = "";
       surfaces[i].style.removeProperty("background-image");
       surfaces[i].classList.remove("nightshift-card");
-      surfaces[i].classList.remove("nightshift-invert");
       surfaces[i].classList.remove("nightshift-icon-invert");
     }
     surfaces = [];
@@ -215,8 +200,8 @@
 
   function dimRootBg(root) {
     if (!root) return;
-    var img = getComputedStyle(root).backgroundImage;
-    if (img === "none" && getComputedStyle(root).backgroundColor === "rgba(0, 0, 0, 0)") return;
+    var cs = getComputedStyle(root);
+    if (cs.backgroundImage === "none" && cs.backgroundColor === "rgba(0, 0, 0, 0)") return;
     root.style.setProperty("background-image", "none", "important");
     root.style.setProperty("background-color", "var(--ns-bg, #121212)", "important");
     surfaces.push(root);
@@ -363,7 +348,7 @@
   function toMin(s){ var p=(s||"00:00").split(":"); return parseInt(p[0],10)*60+parseInt(p[1],10); }
   function inSchedule(state){
     if(!state.scheduleOn) return true;
-    var n=(new Date().getHours())*60+(new Date().getMinutes());
+    var now = new Date(); var n = now.getHours() * 60 + now.getMinutes();
     var s=toMin(state.scheduleStart);
     var e=toMin(state.scheduleEnd);
     return s<=e ? (n>=s && n<e) : (n>=s || n<e);
@@ -397,6 +382,7 @@
 
   function applyTint(state) {
     if (!state.enabled ||
+        !inSchedule(state) ||
         (state.followSystem && !window.matchMedia("(prefers-color-scheme: dark)").matches) ||
         siteOffContains(location.hostname, state.siteOff || [])) {
       apply(state);
@@ -407,27 +393,32 @@
   }
 
   function getState(result) {
+    var ov = ((result["nightshift.siteOverrides"] || {})[location.hostname]) || {};
+    function pick(key, def) {
+      var k = "nightshift." + key;
+      return ov[k] !== undefined ? ov[k] : (result[k] !== undefined ? result[k] : def);
+    }
     return {
       enabled: result["nightshift.enabled"] !== undefined ? result["nightshift.enabled"] : DEFAULTS.enabled,
       mode: result["nightshift.mode"] || DEFAULTS.mode,
       protectMedia: result["nightshift.protectMedia"] !== undefined ? result["nightshift.protectMedia"] : DEFAULTS.protectMedia,
-      brightness: result["nightshift.brightness"] !== undefined ? result["nightshift.brightness"] : DEFAULTS.brightness,
-      contrast: result["nightshift.contrast"] !== undefined ? result["nightshift.contrast"] : DEFAULTS.contrast,
+      brightness: pick("brightness", DEFAULTS.brightness),
+      contrast: pick("contrast", DEFAULTS.contrast),
       followSystem: result["nightshift.followSystem"] !== undefined ? result["nightshift.followSystem"] : DEFAULTS.followSystem,
       siteOff: result["nightshift.siteOff"] || DEFAULTS.siteOff,
-      warmth: result["nightshift.warmth"] !== undefined ? result["nightshift.warmth"] : DEFAULTS.warmth,
+      warmth: pick("warmth", DEFAULTS.warmth),
       scheduleOn: result["nightshift.scheduleOn"] !== undefined ? result["nightshift.scheduleOn"] : DEFAULTS.scheduleOn,
       scheduleStart: result["nightshift.scheduleStart"] !== undefined ? result["nightshift.scheduleStart"] : DEFAULTS.scheduleStart,
       scheduleEnd: result["nightshift.scheduleEnd"] !== undefined ? result["nightshift.scheduleEnd"] : DEFAULTS.scheduleEnd,
       siteModes: result["nightshift.siteModes"] || {},
-      fontSize: result["nightshift.fontSize"] !== undefined ? result["nightshift.fontSize"] : DEFAULTS.fontSize,
-      fontFamily: result["nightshift.fontFamily"] || DEFAULTS.fontFamily,
-      lineHeight: result["nightshift.lineHeight"] !== undefined ? result["nightshift.lineHeight"] : DEFAULTS.lineHeight,
-      customCss: result["nightshift.customCss"] || DEFAULTS.customCss,
-      customBg: result["nightshift.customBg"] || DEFAULTS.customBg,
-      customFg: result["nightshift.customFg"] || DEFAULTS.customFg,
-      customAccent: result["nightshift.customAccent"] || DEFAULTS.customAccent,
-      customCard: result["nightshift.customCard"] || DEFAULTS.customCard
+      fontSize: pick("fontSize", DEFAULTS.fontSize),
+      fontFamily: pick("fontFamily", DEFAULTS.fontFamily),
+      lineHeight: pick("lineHeight", DEFAULTS.lineHeight),
+      customCss: pick("customCss", DEFAULTS.customCss),
+      customBg: pick("customBg", DEFAULTS.customBg),
+      customFg: pick("customFg", DEFAULTS.customFg),
+      customAccent: pick("customAccent", DEFAULTS.customAccent),
+      customCard: pick("customCard", DEFAULTS.customCard)
     };
   }
 
@@ -474,9 +465,22 @@
       if (changes[STRUCTURAL_KEYS[i]]) structural = true;
     }
     for (i = 0; i < KEYS.length; i++) {
-      if (changes[KEYS[i]]) tint = true;
+      if (changes[KEYS[i]] && KEYS[i] !== "nightshift.siteOverrides") tint = true;
     }
-    if (!tint) return;
+    var ovChange = changes["nightshift.siteOverrides"];
+    if (ovChange) {
+      var host = location.hostname;
+      var oldO = (ovChange.oldValue && ovChange.oldValue[host]) || {};
+      var newO = (ovChange.newValue && ovChange.newValue[host]) || {};
+      for (i = 0; i < OVERRIDE_KEYS.length; i++) {
+        var k = "nightshift." + OVERRIDE_KEYS[i];
+        if (oldO[k] !== newO[k]) {
+          tint = true;
+          if (k === "nightshift.customCss") structural = true;
+        }
+      }
+    }
+    if (!tint && !structural) return;
     if (structural) {
       readAndApply();
     } else {
@@ -509,7 +513,7 @@
         for (var j = 0; j < nodes.length; j++) {
           var el = nodes[j];
           if (el.nodeType !== 1) continue;
-          if (el.tagName === "IMG" || el.tagName === "SVG" || el.tagName === "BUTTON" || (el.tagName === "INPUT" && (el.type === "button" || el.type === "submit")) || el.getAttribute("role") === "button" || el.tagName === "DIV" || el.tagName === "SECTION" || el.tagName === "ARTICLE" || el.tagName === "MAIN" || el.tagName === "ASIDE" || el.tagName === "FOOTER" || el.tagName === "HEADER") { want = true; break; }
+          if (el.tagName === "IMG" || el.tagName === "SVG" || el.tagName === "BUTTON" || (el.tagName === "INPUT" && (el.type === "button" || el.type === "submit" || el.type === "reset")) || el.getAttribute("role") === "button" || el.tagName === "DIV" || el.tagName === "SECTION" || el.tagName === "ARTICLE" || el.tagName === "MAIN" || el.tagName === "ASIDE" || el.tagName === "FOOTER" || el.tagName === "HEADER") { want = true; break; }
           if (el.querySelectorAll) {
             var found = el.querySelectorAll("img,svg,button,[role=\"button\"],[style*=\"background\"]");
             if (found.length) { want = true; break; }
@@ -530,5 +534,5 @@
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
   }
-  // ponytail: observer is childList+350ms debounce; style edits don't retrigger it. Re-walk is gated by apply()'s full path.
+  // observer watches childList only (500ms debounce); attribute-only style edits don't retrigger it.
 })();
